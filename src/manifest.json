@@ -1,0 +1,16 @@
+{
+  "name": "Ethereum Gas Station",
+  "version": "1.0",
+  "description": "Check out the real-time gas fee in whatever currency you like",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action" : {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "http://*/"
+  ],
+  "manifest_version": 2
+}
