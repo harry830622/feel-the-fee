@@ -13,6 +13,7 @@ require('dotenv').config({
 module.exports = {
   entry: {
     popup: path.resolve(__dirname, 'src/popup/index.jsx'),
+    option: path.resolve(__dirname, 'src/option/index.jsx'),
     background: path.resolve(__dirname, 'src/background/index.js'),
   },
   resolve: {
@@ -82,6 +83,11 @@ module.exports = {
       filename: 'popup.html',
       template: path.resolve(__dirname, 'src/popup/index.ejs'),
       chunks: ['popup'],
+    }),
+    new HtmlPlugin({
+      filename: 'option.html',
+      template: path.resolve(__dirname, 'src/option/index.ejs'),
+      chunks: ['option'],
     }),
     new CopyPlugin({
       patterns: [path.resolve(__dirname, 'src/manifest.json')],

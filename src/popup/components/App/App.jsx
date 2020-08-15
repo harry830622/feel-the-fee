@@ -58,11 +58,22 @@ const symbolByCurrency = {
 };
 
 const App = () => {
+  const [isConfigLoaded, setIsConfigLoaded] = useState(false);
+  const [currency, setCurrency] = useState('usd');
+  useEffect(() => {
+    chrome.storage.sync.get(null, (result) => {
+      if (result.currency) {
+        setCurrency(result.currency);
+        setIsConfigLoaded(true);
+      }
+    });
+  }, []);
+
   const [isFetching, setIsFetching] = useState(true);
   const [gas, setGas] = useState({});
   const [ethPrice, setEthPrice] = useState(0);
   useEffect(() => {
-    if (isFetching) {
+    if (isConfigLoaded && isFetching) {
       axios
         .get(`${ORIGIN}/api/gas/now`)
         .then((res) => {
@@ -71,17 +82,17 @@ const App = () => {
         .then(() =>
           axios
             .get(
-              `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd`,
+              `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=${currency}`,
             )
             .then((res) => {
-              setEthPrice(res.data.ethereum.usd);
+              setEthPrice(res.data.ethereum[currency]);
             }),
         )
         .then(() => {
           setIsFetching(false);
         });
     }
-  }, [isFetching]);
+  }, [isConfigLoaded, isFetching]);
 
   const handleRefreshClick = useCallback(() => {
     setIsFetching(true);
@@ -95,7 +106,7 @@ const App = () => {
     >
       <AppBar position="fixed">
         <Toolbar>
-          <Typography variant="h6">⛽</Typography>
+          <Typography variant="h6">⛽ EGS</Typography>
           <div
             css={css`
               flex-grow: 1;
@@ -112,13 +123,14 @@ const App = () => {
             padding: 68px 0 20px;
           `}
         >
-          <Paper
-            variant="outlined"
-            css={css`
-              padding: 16px;
-            `}
-          >
-            {isFetching ? (
+          {isFetching ? (
+            <Paper
+              variant="outlined"
+              css={css`
+                padding: 10px 16px 10px;
+              `}
+            >
+              <Skeleton variant="text" animation="wave" width="40%" />
               <Skeleton
                 variant="rect"
                 animation="wave"
@@ -126,64 +138,69 @@ const App = () => {
                   height: 100px;
                 `}
               />
-            ) : (
-              <>
+            </Paper>
+          ) : (
+            <Paper
+              variant="outlined"
+              css={css`
+                padding: 0 16px 10px;
+              `}
+            >
+              <div
+                css={css`
+                  display: flex;
+                  align-items: center;
+                `}
+              >
                 <div
                   css={css`
-                    display: flex;
-                    align-items: center;
+                    flex-grow: 0;
                   `}
                 >
-                  <div
-                    css={css`
-                      flex-grow: 0;
-                    `}
-                  >
-                    <Typography variant="subtitle1">
-                      A transfer will cost you
-                    </Typography>
-                  </div>
-                  <div
-                    css={css`
-                      flex-grow: 1;
-                      display: flex;
-                      flex-direction: row-reverse;
-                    `}
-                  >
-                    <IconButton color="inherit" onClick={handleRefreshClick}>
-                      <RefreshIcon />
-                    </IconButton>
-                  </div>
+                  <Typography variant="subtitle1">
+                    A transfer will cost you
+                  </Typography>
                 </div>
-                <Grid container spacing={2}>
-                  {gasConfigs.map(({ key, title }) => (
-                    <Grid key={key} item xs={4}>
-                      <Paper
-                        variant="outlined"
-                        css={css`
-                          display: flex;
-                          flex-direction: column;
-                          justify-content: center;
-                          align-items: center;
-                          padding: 10px 5px;
-                        `}
-                      >
-                        <Typography variant="subtitle2">
-                          {`${symbolByCurrency.usd}${(
-                            gasLimitByTxType.transfer *
-                            gas[key] *
-                            1e-9 *
-                            ethPrice
-                          ).toFixed(2)}`}
-                        </Typography>
-                        <Typography variant="body2">{title}</Typography>
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
-              </>
-            )}
-          </Paper>
+                <div
+                  css={css`
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: row-reverse;
+                  `}
+                >
+                  <IconButton color="inherit" onClick={handleRefreshClick}>
+                    <RefreshIcon />
+                  </IconButton>
+                </div>
+              </div>
+              <Grid container spacing={2}>
+                {gasConfigs.map(({ key, title }) => (
+                  <Grid key={key} item xs={4}>
+                    <Paper
+                      variant="outlined"
+                      css={css`
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 10px 5px;
+                      `}
+                    >
+                      <Typography variant="subtitle2">
+                        {`${symbolByCurrency[currency]}${(
+                          gasLimitByTxType.transfer *
+                          gas[key] *
+                          1e-9 *
+                          ethPrice
+                        ).toFixed(2)}`}
+                      </Typography>
+                      <Typography variant="body2">{title}</Typography>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          )}
         </main>
       </Container>
     </div>
