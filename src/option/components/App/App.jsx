@@ -3,9 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { jsx, css } from '@emotion/core';
 import {
   Container,
-  AppBar,
-  Toolbar,
   Typography,
+  Paper,
   FormControl,
   InputLabel,
   Select,
@@ -34,11 +33,14 @@ const textByCurrency = {
 const App = () => {
   const [currency, setCurrency] = useState('usd');
   useEffect(() => {
-    chrome.storage.sync.get(null, (result) => {
-      if (result.currency) {
+    chrome.storage.sync.get(
+      {
+        currency: 'usd',
+      },
+      (result) => {
         setCurrency(result.currency);
-      }
-    });
+      },
+    );
   }, []);
   const handleCurrencySelectChange = useCallback((e) => {
     setCurrency(e.target.value);
@@ -48,36 +50,55 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6">⛽ EGS Settings</Typography>
-        </Toolbar>
-      </AppBar>
+    <div
+      css={css`
+        padding: 10px 0;
+      `}
+    >
+      <Typography
+        variant="h4"
+        align="center"
+        css={css`
+          margin-bottom: 10px;
+        `}
+      >
+        Settings
+      </Typography>
       <Container>
-        <main
-          css={css`
-            padding: 88px 0 20px;
-          `}
-        >
-          <FormControl variant="outlined">
-            <InputLabel id="currency-select">Display in</InputLabel>
-            <Select
-              labelId="currency-select"
-              label="Display in"
-              value={currency}
-              onChange={handleCurrencySelectChange}
+        <main>
+          <Paper
+            variant="outlined"
+            css={css`
+              padding: 10px;
+            `}
+          >
+            <Typography
+              variant="h6"
               css={css`
-                width: 200px;
+                margin-bottom: 10px;
               `}
             >
-              {Object.entries(textByCurrency).map(([c, text]) => (
-                <MenuItem key={c} value={c}>
-                  {text}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              General
+            </Typography>
+            <FormControl variant="outlined">
+              <InputLabel id="currency-select">Display in</InputLabel>
+              <Select
+                labelId="currency-select"
+                label="Display in"
+                value={currency}
+                onChange={handleCurrencySelectChange}
+                css={css`
+                  width: 200px;
+                `}
+              >
+                {Object.entries(textByCurrency).map(([c, text]) => (
+                  <MenuItem key={c} value={c}>
+                    {text}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Paper>
         </main>
       </Container>
     </div>

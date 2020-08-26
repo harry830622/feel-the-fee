@@ -20,6 +20,7 @@ module.exports = {
     extensions: ['.js', '.jsx', '.json'],
     alias: {
       assets: path.resolve(__dirname, 'assets'),
+      constants: path.resolve(__dirname, 'src/constants'),
     },
   },
   module: {
