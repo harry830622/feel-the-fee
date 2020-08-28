@@ -1,5 +1,3 @@
-const { BABEL_ENV } = process.env;
-
 module.exports = {
   presets: [
     [
@@ -9,12 +7,8 @@ module.exports = {
         corejs: 3,
       },
     ],
-    [
-      '@babel/preset-react',
-      {
-        development: BABEL_ENV === 'development',
-      },
-    ],
+    ['@babel/preset-react'],
+    ['@emotion/babel-preset-css-prop'],
   ],
   plugins: [],
 };

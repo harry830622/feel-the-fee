@@ -1,14 +1,16 @@
-const path = require('path');
 const { merge } = require('webpack-merge');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const base = require('./webpack.base.config');
+
+const { PORT = '8080' } = process.env;
 
 module.exports = merge(base, {
   mode: 'development',
   devtool: 'inline-source-map',
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+  plugins: [new ReactRefreshWebpackPlugin()],
+  devServer: {
+    port: parseInt(PORT, 10),
+    hot: true,
   },
 });

@@ -6,13 +6,15 @@ const { EnvironmentPlugin } = require('webpack');
 require('dotenv').config({
   path: path.resolve(
     __dirname,
-    process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.prod',
+    process.env.NODE_ENV === 'development'
+      ? '.env.extension.dev'
+      : '.env.extension.prod',
   ),
 });
 
 module.exports = {
   entry: {
-    index: path.resolve(__dirname, 'src/index.jsx'),
+    popup: path.resolve(__dirname, 'src/extension/popup/index.jsx'),
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
@@ -79,15 +81,16 @@ module.exports = {
   },
   plugins: [
     new HtmlPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, 'src/index.ejs'),
-      chunks: ['index'],
+      filename: 'popup.html',
+      template: path.resolve(__dirname, 'src/extension/popup/index.ejs'),
+      chunks: ['popup'],
     }),
     new EnvironmentPlugin(['API_ORIGIN']),
     new CopyPlugin({
       patterns: [
+        path.resolve(__dirname, 'src/extension/manifest.json'),
         {
-          from: path.resolve(__dirname, 'assets/favicon/*'),
+          from: path.resolve(__dirname, 'assets/extension/icon*.png'),
           flatten: true,
         },
       ],

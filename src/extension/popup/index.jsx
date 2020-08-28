@@ -3,13 +3,18 @@ import 'regenerator-runtime/runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { css } from '@emotion/core';
 
-import App from './components/App';
+import App from '../../components/App';
 
 ReactDOM.render(
   <>
     <CssBaseline />
-    <App />
+    <App
+      css={css`
+        width: 400px;
+      `}
+    />
   </>,
   document.querySelector('#react'),
 );

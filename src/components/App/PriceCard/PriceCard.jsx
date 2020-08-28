@@ -1,6 +1,6 @@
-/** @jsx jsx */
 import React from 'react';
-import { jsx, css } from '@emotion/core';
+import PropTypes from 'prop-types';
+import { css } from '@emotion/core';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
@@ -68,6 +68,25 @@ const PriceCard = (props) => {
       </Paper>
     </div>
   );
+};
+
+PriceCard.propTypes = {
+  className: PropTypes.string.isRequired,
+  isFetching: PropTypes.bool.isRequired,
+  gasNow: PropTypes.shape({
+    price: PropTypes.shape({
+      fastest: PropTypes.number.isRequired,
+      fast: PropTypes.number.isRequired,
+      average: PropTypes.number.isRequired,
+      safeLow: PropTypes.number.isRequired,
+    }).isRequired,
+    waitTimeInSec: PropTypes.shape({
+      fastest: PropTypes.number.isRequired,
+      fast: PropTypes.number.isRequired,
+      average: PropTypes.number.isRequired,
+      safeLow: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default PriceCard;

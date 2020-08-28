@@ -1,6 +1,6 @@
-/** @jsx jsx */
 import React, { useState, useEffect, useCallback } from 'react';
-import { jsx, css } from '@emotion/core';
+import PropTypes from 'prop-types';
+import { css } from '@emotion/core';
 import {
   Paper,
   FormControl,
@@ -56,7 +56,7 @@ const FeeCard = (props) => {
           Fee
         </Typography>
         <FormControl variant="outlined" size="small" fullWidth>
-          <Select value={txType} onChange={handleTxTypeSelectChange} autoWidth>
+          <Select value={txType} onChange={handleTxTypeSelectChange}>
             {Object.entries(textByTxType).map(([k, text]) => (
               <MenuItem key={k} value={k}>
                 {text}
@@ -89,6 +89,37 @@ const FeeCard = (props) => {
       </Paper>
     </div>
   );
+};
+
+FeeCard.propTypes = {
+  className: PropTypes.string.isRequired,
+  isFetching: PropTypes.bool.isRequired,
+  gas: PropTypes.shape({
+    price: PropTypes.shape({
+      fastest: PropTypes.number.isRequired,
+      fast: PropTypes.number.isRequired,
+      average: PropTypes.number.isRequired,
+      safeLow: PropTypes.number.isRequired,
+    }).isRequired,
+    waitTimeInSec: PropTypes.shape({
+      fastest: PropTypes.number.isRequired,
+      fast: PropTypes.number.isRequired,
+      average: PropTypes.number.isRequired,
+      safeLow: PropTypes.number.isRequired,
+    }).isRequired,
+    limit: PropTypes.shape({
+      yearn__vault__yCrv: PropTypes.shape({
+        deposit: PropTypes.number.isRequired,
+        withdraw: PropTypes.number.isRequired,
+      }).isRequired,
+      curve__pool__y: PropTypes.shape({
+        add_liquidity: PropTypes.number.isRequired,
+        remove_liquidity: PropTypes.number.isRequired,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
+  ethPrice: PropTypes.number.isRequired,
+  currency: PropTypes.string.isRequired,
 };
 
 export default FeeCard;
