@@ -13,6 +13,7 @@ ReactDOM.render(
     <App
       css={css`
         width: 400px;
+        padding: 10px 0;
       `}
     />
   </>,

@@ -114,11 +114,7 @@ const App = (props) => {
         />
       </Helmet>
       <div className={className}>
-        <Container
-          css={css`
-            padding: 10px 0;
-          `}
-        >
+        <Container>
           <div
             css={css`
               display: flex;
