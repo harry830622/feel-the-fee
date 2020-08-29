@@ -83,7 +83,7 @@ module.exports = {
       template: path.resolve(__dirname, 'src/index.ejs'),
       chunks: ['index'],
     }),
-    new EnvironmentPlugin(['API_ORIGIN']),
+    new EnvironmentPlugin(['API_ORIGIN', 'GA_TRACKING_ID']),
     new CopyPlugin({
       patterns: [
         {

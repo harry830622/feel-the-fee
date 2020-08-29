@@ -21,8 +21,6 @@ import { symbolByCurrency } from 'constants';
 import PriceCard from './PriceCard';
 import FeeCard from './FeeCard';
 
-const { API_ORIGIN } = process.env;
-
 const App = (props) => {
   const { className } = props;
 
@@ -61,7 +59,7 @@ const App = (props) => {
   const [gasNow, setGasNow] = useState({});
   useEffect(() => {
     axios
-      .get(`${API_ORIGIN}/api/gas/now`)
+      .get(`${process.env.API_ORIGIN}/api/gas/now`)
       .then((res) => {
         setGasNow(res.data);
       })
@@ -74,7 +72,7 @@ const App = (props) => {
   const [gass, setGass] = useState([]);
   useEffect(() => {
     axios
-      .get(`${API_ORIGIN}/api/gas`)
+      .get(`${process.env.API_ORIGIN}/api/gas`)
       .then((res) => {
         setGass(res.data);
       })
@@ -86,6 +84,29 @@ const App = (props) => {
   return (
     <>
       <Helmet>
+        <title>Feel the Fee</title>
+        <meta name="title" content="Feel the Fee" />
+        <meta
+          name="description"
+          content="How much gas fee will it cost to do some yield farming on Yearn/Curve/Balancer? How much gas fee do I need to pay to swap a coin on Uniswap? Check out real-time gas fees on Ethereum in whatever currency you like right now!"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://fee.finance/" />
+        <meta property="og:title" content="Feel the Fee" />
+        <meta
+          property="og:description"
+          content="How much gas fee will it cost to do some yield farming on Yearn/Curve/Balancer? How much gas fee do I need to pay to swap a coin on Uniswap? Check out real-time gas fees on Ethereum in whatever currency you like right now!"
+        />
+        {/* <meta property="og:image" content="" /> */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://fee.finance/" />
+        <meta property="twitter:title" content="Feel the Fee" />
+        <meta
+          property="twitter:description"
+          content="How much gas fee will it cost to do some yield farming on Yearn/Curve/Balancer? How much gas fee do I need to pay to swap a coin on Uniswap? Check out real-time gas fees on Ethereum in whatever currency you like right now!"
+        />
+        {/* <meta property="twitter:image" content="" /> */}
+
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -107,11 +128,25 @@ const App = (props) => {
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
-        <title>Feel the Fee</title>
+
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
+
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GA_TRACKING_ID}`}
+        />
+        <script>
+          {`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', '${process.env.GA_TRACKING_ID}');
+          `}
+        </script>
       </Helmet>
       <div className={className}>
         <Container>
