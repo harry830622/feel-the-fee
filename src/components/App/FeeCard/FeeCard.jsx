@@ -14,6 +14,7 @@ import {
   symbolByCurrency,
   contractNameAndMethodByTxType,
   textByTxType,
+  textBySpeed,
 } from 'constants';
 
 const FeeCard = (props) => {
@@ -39,6 +40,17 @@ const FeeCard = (props) => {
     setTxType(e.target.value);
   }, []);
 
+  const [speed, setSpeed] = useState('average');
+  useEffect(() => {
+    if (localStorage.getItem('speed')) {
+      setSpeed(localStorage.getItem('speed'));
+    }
+  }, []);
+  const handleSpeedSelectChange = useCallback((e) => {
+    setSpeed(e.target.value);
+    localStorage.setItem('speed', e.target.value);
+  }, []);
+
   return (
     <div className={className}>
       <Paper
@@ -47,14 +59,25 @@ const FeeCard = (props) => {
           padding: 10px;
         `}
       >
-        <Typography
-          variant="h6"
+        <div
           css={css`
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
           `}
         >
-          Fee
-        </Typography>
+          <Typography variant="h6">Fee</Typography>
+          <FormControl variant="outlined" size="small">
+            <Select value={speed} onChange={handleSpeedSelectChange}>
+              {Object.entries(textBySpeed).map(([k, text]) => (
+                <MenuItem key={k} value={k}>
+                  {text}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
         <FormControl variant="outlined" size="small" fullWidth>
           <Select value={txType} onChange={handleTxTypeSelectChange}>
             {Object.entries(textByTxType).map(([k, text]) => (
@@ -68,6 +91,7 @@ const FeeCard = (props) => {
           css={css`
             display: flex;
             justify-content: flex-end;
+            align-items: center;
             margin-top: 10px;
           `}
         >
@@ -79,7 +103,7 @@ const FeeCard = (props) => {
             <Typography variant="h5">
               {`${symbolByCurrency[currency]}${(
                 gasLimitByTxType[txType] *
-                gas.price.average *
+                gas.price[speed] *
                 1e-9 *
                 ethPrice
               ).toFixed(2)}`}

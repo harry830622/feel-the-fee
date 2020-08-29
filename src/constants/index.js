@@ -65,3 +65,9 @@ export const textByTxType = {
   [txTypeByMethodByContractName.curve__pool__y.remove_liquidity]:
     'Withdraw from Curve Y pool',
 };
+
+export const textBySpeed = {
+  fast: 'Fast',
+  average: 'Average',
+  safeLow: 'Slow',
+};

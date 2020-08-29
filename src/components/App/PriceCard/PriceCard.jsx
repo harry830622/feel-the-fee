@@ -4,20 +4,9 @@ import { css } from '@emotion/core';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
-const gasConfigs = [
-  {
-    key: 'fast',
-    title: 'Fast',
-  },
-  {
-    key: 'average',
-    title: 'Average',
-  },
-  {
-    key: 'safeLow',
-    title: 'Slow',
-  },
-];
+import { textBySpeed } from 'constants';
+
+const visibleSpeeds = ['fast', 'average', 'safeLow'];
 
 const PriceCard = (props) => {
   const { className, isFetching, gasNow } = props;
@@ -39,8 +28,8 @@ const PriceCard = (props) => {
           Price
         </Typography>
         <Grid container spacing={2}>
-          {gasConfigs.map(({ key, title }) => (
-            <Grid key={key} item xs={4}>
+          {visibleSpeeds.map((speed) => (
+            <Grid key={speed} item xs={4}>
               <Paper
                 variant="outlined"
                 css={css`
@@ -57,10 +46,10 @@ const PriceCard = (props) => {
                   </Skeleton>
                 ) : (
                   <Typography variant="subtitle2">
-                    {`${gasNow.price[key]}`}
+                    {`${gasNow.price[speed]}`}
                   </Typography>
                 )}
-                <Typography variant="body2">{title}</Typography>
+                <Typography variant="body2">{textBySpeed[speed]}</Typography>
               </Paper>
             </Grid>
           ))}
