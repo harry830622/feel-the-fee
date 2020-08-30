@@ -174,10 +174,10 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
           </div>
           <main>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <PriceCard isFetching={isFetchingGasNow} gasNow={gasNow} />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <FeeCard
                   isFetching={isFetchingGass || isFetchingEthPriceByCurrency}
                   gas={gass[gass.length - 1]}

@@ -58,22 +58,37 @@ export const contractNameAndMethodByTxType = Object.entries(
   {},
 );
 
-export const textByTxType = {
-  transfer: 'Transfer',
-  [txTypeByMethodByContractName.yearn__vault__yCrv.deposit]:
-    'Deposit to Yearn yCRV vault',
-  [txTypeByMethodByContractName.yearn__vault__yCrv.withdraw]:
-    'Withdraw from Yearn yCRV vault',
-  [txTypeByMethodByContractName.curve__pool__y.add_liquidity]:
-    'Deposit to Curve Y pool',
-  [txTypeByMethodByContractName.curve__pool__y.remove_liquidity]:
-    'Withdraw from Curve Y pool',
-  [txTypeByMethodByContractName.curveDao__gauge__yCrv.deposit]:
-    'Deposit to CurveDAO yCRV gauge',
-  [txTypeByMethodByContractName.curveDao__gauge__yCrv.withdraw]:
-    'Withdraw to CurveDAO yCRV gauge',
-  [txTypeByMethodByContractName.curveDao__minter.mint]:
-    'Claim CRV from CurveDAO Minter',
+export const textByCategory = {
+  general: 'General',
+  yearn: 'yEarn',
+  curve: 'Curve',
+  curveDao: 'CurveDAO',
+};
+
+export const textByTxTypeByCategory = {
+  general: {
+    'transfer--eth': 'Transfer ETH',
+  },
+  yearn: {
+    [txTypeByMethodByContractName.yearn__vault__yCrv.deposit]:
+      'Deposit to yCRV vault',
+    [txTypeByMethodByContractName.yearn__vault__yCrv.withdraw]:
+      'Withdraw from yCRV vault',
+  },
+  curve: {
+    [txTypeByMethodByContractName.curve__pool__y.add_liquidity]:
+      'Deposit to Y pool',
+    [txTypeByMethodByContractName.curve__pool__y.remove_liquidity]:
+      'Withdraw from Y pool',
+  },
+  curveDao: {
+    [txTypeByMethodByContractName.curveDao__gauge__yCrv.deposit]:
+      'Deposit to yCRV gauge',
+    [txTypeByMethodByContractName.curveDao__gauge__yCrv.withdraw]:
+      'Withdraw from yCRV gauge',
+    [txTypeByMethodByContractName.curveDao__minter.mint]:
+      'Claim CRV from minter',
+  },
 };
 
 export const textBySpeed = {

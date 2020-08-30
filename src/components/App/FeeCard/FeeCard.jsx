@@ -7,22 +7,24 @@ import {
   Select,
   MenuItem,
   Typography,
+  Grid,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
 import {
   symbolByCurrency,
   contractNameAndMethodByTxType,
-  textByTxType,
+  textByCategory,
+  textByTxTypeByCategory,
   textBySpeed,
 } from 'constants';
 
 const FeeCard = (props) => {
   const { className, isFetching, gas, ethPrice, currency } = props;
 
-  const [txType, setTxType] = useState('transfer');
+  const [txType, setTxType] = useState('yearn__vault__yCrv__deposit');
   const [gasLimitByTxType, setGasLimitByTxType] = useState({
-    transfer: 21000,
+    'transfer--eth': 21000,
   });
   useEffect(() => {
     setGasLimitByTxType((prev) => ({
@@ -38,6 +40,12 @@ const FeeCard = (props) => {
   }, [gas]);
   const handleTxTypeSelectChange = useCallback((e) => {
     setTxType(e.target.value);
+  }, []);
+
+  const [category, setCategory] = useState('yearn');
+  const handleCategorySelectChange = useCallback((e) => {
+    setCategory(e.target.value);
+    setTxType(Object.keys(textByTxTypeByCategory[e.target.value])[0]);
   }, []);
 
   const [speed, setSpeed] = useState('average');
@@ -78,15 +86,32 @@ const FeeCard = (props) => {
             </Select>
           </FormControl>
         </div>
-        <FormControl variant="outlined" size="small" fullWidth>
-          <Select value={txType} onChange={handleTxTypeSelectChange}>
-            {Object.entries(textByTxType).map(([k, text]) => (
-              <MenuItem key={k} value={k}>
-                {text}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Grid container>
+          <Grid item xs={12} md={4}>
+            <FormControl variant="outlined" size="small" fullWidth>
+              <Select value={category} onChange={handleCategorySelectChange}>
+                {Object.entries(textByCategory).map(([k, text]) => (
+                  <MenuItem key={k} value={k}>
+                    {text}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <FormControl variant="outlined" size="small" fullWidth>
+              <Select value={txType} onChange={handleTxTypeSelectChange}>
+                {Object.entries(textByTxTypeByCategory[category]).map(
+                  ([k, text]) => (
+                    <MenuItem key={k} value={k}>
+                      {text}
+                    </MenuItem>
+                  ),
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
         <div
           css={css`
             display: flex;
@@ -131,16 +156,7 @@ FeeCard.propTypes = {
       average: PropTypes.number.isRequired,
       safeLow: PropTypes.number.isRequired,
     }).isRequired,
-    limit: PropTypes.shape({
-      yearn__vault__yCrv: PropTypes.shape({
-        deposit: PropTypes.number.isRequired,
-        withdraw: PropTypes.number.isRequired,
-      }).isRequired,
-      curve__pool__y: PropTypes.shape({
-        add_liquidity: PropTypes.number.isRequired,
-        remove_liquidity: PropTypes.number.isRequired,
-      }).isRequired,
-    }).isRequired,
+    limit: PropTypes.object.isRequired,
   }).isRequired,
   ethPrice: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
