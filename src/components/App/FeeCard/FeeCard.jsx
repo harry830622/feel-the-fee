@@ -55,7 +55,7 @@ const FeeCard = (props) => {
     setTxType(Object.keys(textByTxTypeByCategory[e.target.value])[0]);
   }, []);
 
-  const [speed, setSpeed] = useState('average');
+  const [speed, setSpeed] = useState('standard');
   useEffect(() => {
     if (localStorage.getItem('speed')) {
       setSpeed(localStorage.getItem('speed'));
