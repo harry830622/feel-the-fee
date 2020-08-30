@@ -17,7 +17,7 @@ import {
   Twitter as TwitterIcon,
 } from '@material-ui/icons';
 
-import { symbolByCurrency } from 'constants';
+import { symbolByCurrency, methodsByContractName } from 'constants';
 import PriceCard from './PriceCard';
 import FeeCard from './FeeCard';
 
@@ -39,7 +39,15 @@ const App = (props) => {
     isFetchingEthPriceByCurrency,
     setIsFetchingEthPriceByCurrency,
   ] = useState(true);
-  const [ethPriceByCurrency, setEthPriceByCurrency] = useState({ usd: 400 });
+  const [ethPriceByCurrency, setEthPriceByCurrency] = useState(
+    Object.keys(symbolByCurrency).reduce(
+      (prev, curr) => ({
+        ...prev,
+        [curr]: 0,
+      }),
+      {},
+    ),
+  );
   useEffect(() => {
     axios
       .get(
@@ -55,31 +63,56 @@ const App = (props) => {
       });
   }, []);
 
-  const [isFetchingGasNow, setIsFetchingGasNow] = useState(true);
-  const [gasNow, setGasNow] = useState({});
+  const [isFetchingGasPrices, setIsFetchingGasPrices] = useState(true);
+  const [gasPrices, setGasPrices] = useState([]);
   useEffect(() => {
     axios
-      .get(`${process.env.API_ORIGIN}/api/gas/now`)
+      .get(`${process.env.API_ORIGIN}/api/gas-price`)
       .then((res) => {
-        setGasNow(res.data);
+        setGasPrices(res.data);
       })
       .then(() => {
-        setIsFetchingGasNow(false);
+        setIsFetchingGasPrices(false);
       });
   }, []);
 
-  const [isFetchingGass, setIsFetchingGass] = useState(true);
-  const [gass, setGass] = useState([]);
+  const [isFetchingGasUseds, setIsFetchingGasUseds] = useState(true);
+  const [gasUseds, setGasUseds] = useState([]);
   useEffect(() => {
     axios
-      .get(`${process.env.API_ORIGIN}/api/gas`)
+      .get(`${process.env.API_ORIGIN}/api/gas-used`)
       .then((res) => {
-        setGass(res.data);
+        setGasUseds(res.data);
       })
       .then(() => {
-        setIsFetchingGass(false);
+        setIsFetchingGasUseds(false);
       });
   }, []);
+
+  const gasPriceBySpeed = gasPrices[0] ?? {
+    instant: 0,
+    fast: 0,
+    standard: 0,
+    slow: 0,
+  };
+  const gasUsedByMethodByContractName = Object.entries(
+    methodsByContractName,
+  ).reduce(
+    (prev, [contractName, methods]) => ({
+      ...prev,
+      [contractName]: methods.reduce(
+        (pprev, method) => ({
+          ...pprev,
+          [method]:
+            gasUseds.find(
+              (u) => u.contractName === contractName && u.method === method,
+            )?.amount ?? 0,
+        }),
+        {},
+      ),
+    }),
+    {},
+  );
 
   return (
     <>
@@ -175,12 +208,20 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
           <main>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <PriceCard isFetching={isFetchingGasNow} gasNow={gasNow} />
+                <PriceCard
+                  isFetching={isFetchingGasPrices}
+                  gasPriceBySpeed={gasPriceBySpeed}
+                />
               </Grid>
               <Grid item xs={12}>
                 <FeeCard
-                  isFetching={isFetchingGass || isFetchingEthPriceByCurrency}
-                  gas={gass[gass.length - 1]}
+                  isFetching={
+                    isFetchingGasPrices ||
+                    isFetchingGasUseds ||
+                    isFetchingEthPriceByCurrency
+                  }
+                  gasPriceBySpeed={gasPriceBySpeed}
+                  gasUsedByMethodByContractName={gasUsedByMethodByContractName}
                   ethPrice={ethPriceByCurrency[currency]}
                   currency={currency}
                 />
@@ -225,7 +266,11 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
 };
 
 App.propTypes = {
-  className: PropTypes.string.isRequired,
+  className: PropTypes.string,
+};
+
+App.defaultProps = {
+  className: '',
 };
 
 export default App;

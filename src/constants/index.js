@@ -1,29 +1,35 @@
 export const symbolByCurrency = {
-  eth: 'Ξ',
-  btc: '₿',
-  twd: 'NT$',
   usd: '$',
-  cad: '$',
-  aud: '$',
+  twd: 'NT$',
+  hkd: 'HK$',
   cny: '¥',
   jpy: '¥',
   sgd: '$',
+  gbp: '£',
+  eur: '€',
+  cad: '$',
+  aud: '$',
   thb: '฿',
   vnd: '₫',
-  eur: '€',
-  gbp: '£',
   inr: '₹',
   krw: '₩',
-  hkd: 'HK$',
+  eth: 'Ξ',
+  btc: '₿',
 };
 
-// TODO: Move it to backend so that we don't need to update frontend code just
-// for adding a new txType
 export const methodsByContractName = {
   yearn__vault__yCrv: ['deposit', 'withdraw'],
   curve__pool__y: ['add_liquidity', 'remove_liquidity'],
   curveDao__gauge__yCrv: ['deposit', 'withdraw'],
   curveDao__minter: ['mint'],
+  uniswap__router: [
+    'swapExactETHForTokens',
+    'addLiquidityETH',
+    'removeLiquidityETH',
+  ],
+  weth: ['transfer', 'approve'],
+  usdt: ['transfer', 'approve'],
+  dai: ['transfer', 'approve'],
 };
 
 export const txTypeByMethodByContractName = Object.entries(
@@ -60,6 +66,7 @@ export const contractNameAndMethodByTxType = Object.entries(
 
 export const textByCategory = {
   general: 'General',
+  uniswap: 'Uniswap',
   yearn: 'yEarn',
   curve: 'Curve',
   curveDao: 'CurveDAO',
@@ -67,7 +74,21 @@ export const textByCategory = {
 
 export const textByTxTypeByCategory = {
   general: {
-    'transfer--eth': 'Transfer ETH',
+    eth__transfer: 'Transfer ETH',
+    [txTypeByMethodByContractName.weth.transfer]: 'Transfer WETH',
+    [txTypeByMethodByContractName.usdt.transfer]: 'Transfer USDT',
+    [txTypeByMethodByContractName.dai.transfer]: 'Transfer DAI',
+    [txTypeByMethodByContractName.weth.approve]: 'Approve WETH to be spent',
+    [txTypeByMethodByContractName.usdt.approve]: 'Approve USDT to be spent',
+    [txTypeByMethodByContractName.dai.approve]: 'Approve DAI to be spent',
+  },
+  uniswap: {
+    [txTypeByMethodByContractName.uniswap__router.swapExactETHForTokens]:
+      'Swap tokens',
+    [txTypeByMethodByContractName.uniswap__router.addLiquidityETH]:
+      'Add liquidity',
+    [txTypeByMethodByContractName.uniswap__router.removeLiquidityETH]:
+      'Remove liquidity',
   },
   yearn: {
     [txTypeByMethodByContractName.yearn__vault__yCrv.deposit]:
@@ -92,7 +113,8 @@ export const textByTxTypeByCategory = {
 };
 
 export const textBySpeed = {
+  instant: 'Instant',
   fast: 'Fast',
-  average: 'Average',
-  safeLow: 'Slow',
+  standard: 'Standard',
+  slow: 'Slow',
 };

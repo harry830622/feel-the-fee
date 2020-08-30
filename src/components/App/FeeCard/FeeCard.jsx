@@ -20,24 +20,31 @@ import {
 } from 'constants';
 
 const FeeCard = (props) => {
-  const { className, isFetching, gas, ethPrice, currency } = props;
+  const {
+    className,
+    isFetching,
+    gasPriceBySpeed,
+    gasUsedByMethodByContractName,
+    ethPrice,
+    currency,
+  } = props;
 
   const [txType, setTxType] = useState('yearn__vault__yCrv__deposit');
-  const [gasLimitByTxType, setGasLimitByTxType] = useState({
-    'transfer--eth': 21000,
+  const [gasUsedByTxType, setGasUsedByTxType] = useState({
+    eth__transfer: 21000,
   });
   useEffect(() => {
-    setGasLimitByTxType((prev) => ({
+    setGasUsedByTxType((prev) => ({
       ...prev,
       ...Object.entries(contractNameAndMethodByTxType).reduce(
         (pprev, [t, [contractName, method]]) => ({
           ...pprev,
-          [t]: gas?.limit?.[contractName][method],
+          [t]: gasUsedByMethodByContractName?.[contractName]?.[method],
         }),
         {},
       ),
     }));
-  }, [gas]);
+  }, [gasUsedByMethodByContractName]);
   const handleTxTypeSelectChange = useCallback((e) => {
     setTxType(e.target.value);
   }, []);
@@ -87,7 +94,7 @@ const FeeCard = (props) => {
           </FormControl>
         </div>
         <Grid container>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={4}>
             <FormControl variant="outlined" size="small" fullWidth>
               <Select value={category} onChange={handleCategorySelectChange}>
                 {Object.entries(textByCategory).map(([k, text]) => (
@@ -98,7 +105,7 @@ const FeeCard = (props) => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} sm={8}>
             <FormControl variant="outlined" size="small" fullWidth>
               <Select value={txType} onChange={handleTxTypeSelectChange}>
                 {Object.entries(textByTxTypeByCategory[category]).map(
@@ -127,8 +134,8 @@ const FeeCard = (props) => {
           ) : (
             <Typography variant="h5">
               {`${symbolByCurrency[currency]}${(
-                gasLimitByTxType[txType] *
-                gas.price[speed] *
+                gasUsedByTxType[txType] *
+                gasPriceBySpeed[speed] *
                 1e-9 *
                 ethPrice
               ).toFixed(2)}`}
@@ -141,25 +148,21 @@ const FeeCard = (props) => {
 };
 
 FeeCard.propTypes = {
-  className: PropTypes.string.isRequired,
+  className: PropTypes.string,
   isFetching: PropTypes.bool.isRequired,
-  gas: PropTypes.shape({
-    price: PropTypes.shape({
-      fastest: PropTypes.number.isRequired,
-      fast: PropTypes.number.isRequired,
-      average: PropTypes.number.isRequired,
-      safeLow: PropTypes.number.isRequired,
-    }).isRequired,
-    waitTimeInSec: PropTypes.shape({
-      fastest: PropTypes.number.isRequired,
-      fast: PropTypes.number.isRequired,
-      average: PropTypes.number.isRequired,
-      safeLow: PropTypes.number.isRequired,
-    }).isRequired,
-    limit: PropTypes.object.isRequired,
+  gasPriceBySpeed: PropTypes.shape({
+    instant: PropTypes.number.isRequired,
+    fast: PropTypes.number.isRequired,
+    standard: PropTypes.number.isRequired,
+    slow: PropTypes.number.isRequired,
   }).isRequired,
+  gasUsedByMethodByContractName: PropTypes.object.isRequired,
   ethPrice: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
+};
+
+FeeCard.defaultProps = {
+  className: '',
 };
 
 export default FeeCard;
