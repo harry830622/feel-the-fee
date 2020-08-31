@@ -20,6 +20,7 @@ import {
 import { symbolByCurrency, methodsByContractName } from 'constants';
 import PriceCard from './PriceCard';
 import FeeCard from './FeeCard';
+import HistoryCard from './HistoryCard';
 
 const App = (props) => {
   const { className } = props;
@@ -181,6 +182,7 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
           `}
         </script>
       </Helmet>
+
       <div className={className}>
         <Container>
           <div
@@ -224,6 +226,12 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
                   gasUsedByMethodByContractName={gasUsedByMethodByContractName}
                   ethPrice={ethPriceByCurrency[currency]}
                   currency={currency}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <HistoryCard
+                  isFetching={isFetchingGasPrices}
+                  gasPrices={gasPrices}
                 />
               </Grid>
             </Grid>

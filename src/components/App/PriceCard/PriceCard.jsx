@@ -29,14 +29,16 @@ const PriceCard = (props) => {
           padding: 10px;
         `}
       >
-        <Typography
-          variant="h6"
+        <div
           css={css`
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
           `}
         >
-          Price
-        </Typography>
+          <Typography variant="h6">Price</Typography>
+        </div>
         <Grid container spacing={2}>
           {visibleSpeeds.map((speed) => (
             <Grid key={speed} item xs={12 / visibleSpeeds.length}>

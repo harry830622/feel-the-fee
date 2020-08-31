@@ -55,6 +55,7 @@
     "react-helmet": "^6.1.0",
     "react-redux": "^7.2.1",
     "react-refresh": "^0.8.3",
+    "recharts": "^1.8.5",
     "redux": "^4.0.5",
     "redux-observable": "^1.2.0",
     "regenerator-runtime": "^0.13.7",
