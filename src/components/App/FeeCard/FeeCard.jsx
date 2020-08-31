@@ -8,6 +8,7 @@ import {
   MenuItem,
   Typography,
   Grid,
+  Link,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
@@ -122,11 +123,18 @@ const FeeCard = (props) => {
         <div
           css={css`
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
             margin-top: 10px;
           `}
         >
+          <Link
+            href="https://forms.gle/hyzysABQ8sPHxuiH6"
+            target="_blank"
+            rel="noopener"
+          >
+            Can&apos;t find what you want?
+          </Link>
           {isFetching ? (
             <Skeleton variant="text" animation="wave" width="40%">
               <Typography variant="h4">Fetching...</Typography>

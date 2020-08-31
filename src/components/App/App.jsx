@@ -194,10 +194,10 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
               padding: 20px 0;
             `}
           >
-            <Typography variant="h4" align="center">
+            <Typography variant="h5" align="center">
               ⛽ Feel the Fee
             </Typography>
-            <FormControl variant="outlined">
+            <FormControl variant="outlined" size="small">
               <Select value={currency} onChange={handleCurrencySelectChange}>
                 {Object.keys(symbolByCurrency).map((k) => (
                   <MenuItem key={k} value={k}>
