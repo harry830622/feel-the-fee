@@ -118,3 +118,10 @@ export const textBySpeed = {
   standard: 'Standard',
   slow: 'Slow',
 };
+
+export const waitTimeTextBySpeed = {
+  instant: '≈ 15 Sec.',
+  fast: '≈ 1 Min.',
+  standard: '≈ 5 Min.',
+  slow: '> 10 Min.',
+};

@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
-import { textBySpeed } from 'constants';
+import { textBySpeed, waitTimeTextBySpeed } from 'constants';
 
 const PriceCard = (props) => {
   const { className, isFetching, gasPriceBySpeed } = props;
@@ -32,12 +32,20 @@ const PriceCard = (props) => {
         <div
           css={css`
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 10px;
           `}
         >
-          <Typography variant="h6">Price</Typography>
+          <Typography variant="h6">
+            Price
+            <Typography
+              variant="caption"
+              css={css`
+                margin-left: 5px;
+              `}
+            >
+              (in Gwei)
+            </Typography>
+          </Typography>
         </div>
         <Grid container spacing={2}>
           {visibleSpeeds.map((speed) => (
@@ -54,14 +62,17 @@ const PriceCard = (props) => {
               >
                 {isFetching ? (
                   <Skeleton variant="text" animation="wave" width="40%">
-                    <Typography variant="subtitle2">Fetching...</Typography>
+                    <Typography variant="subtitle1">Fetching...</Typography>
                   </Skeleton>
                 ) : (
-                  <Typography variant="subtitle2">
+                  <Typography variant="subtitle1">
                     {`${gasPriceBySpeed[speed]}`}
                   </Typography>
                 )}
-                <Typography variant="body2">{textBySpeed[speed]}</Typography>
+                <Typography variant="caption">{textBySpeed[speed]}</Typography>
+                <Typography variant="caption">
+                  {waitTimeTextBySpeed[speed]}
+                </Typography>
               </Paper>
             </Grid>
           ))}
