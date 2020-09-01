@@ -1,8 +1,8 @@
 {
-  "name": "ethereum-gas-station",
+  "name": "feel-the-fee",
   "version": "1.0.0",
   "description": "",
-  "main": "background.js",
+  "main": "src/index.jsx",
   "scripts": {
     "dev": "NODE_ENV=development webpack-dev-server --config webpack.dev.config.js",
     "build": "NODE_ENV=production webpack --config webpack.prod.config.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/harry830622/ethereum-gas-station.git"
+    "url": "git+https://github.com/harry830622/feel-the-fee.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/harry830622/ethereum-gas-station/issues"
+    "url": "https://github.com/harry830622/feel-the-fee/issues"
   },
-  "homepage": "https://github.com/harry830622/ethereum-gas-station#readme",
+  "homepage": "https://github.com/harry830622/feel-the-fee#readme",
   "devDependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.1",
@@ -36,6 +36,7 @@
     "copy-webpack-plugin": "^6.0.3",
     "core-js": "^3.6.5",
     "css-loader": "^4.2.1",
+    "dotenv": "^8.2.0",
     "eslint": "7.2.0",
     "eslint-config-airbnb": "18.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -65,11 +66,5 @@
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^5.1.1"
-  },
-  "browserslist": [
-    "defaults"
-  ],
-  "dependencies": {
-    "dotenv": "^8.2.0"
   }
 }

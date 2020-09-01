@@ -83,7 +83,9 @@ const FeeCard = (props) => {
             margin-bottom: 10px;
           `}
         >
-          <Typography variant="h6">Fee</Typography>
+          <Typography component="h2" variant="h6">
+            Fee
+          </Typography>
           <FormControl variant="outlined" size="small">
             <Select value={speed} onChange={handleSpeedSelectChange}>
               {Object.entries(textBySpeed).map(([k, text]) => (
@@ -137,10 +139,10 @@ const FeeCard = (props) => {
           </Link>
           {isFetching ? (
             <Skeleton variant="text" animation="wave" width="40%">
-              <Typography variant="h4">Fetching...</Typography>
+              <Typography variant="h5">Fetching...</Typography>
             </Skeleton>
           ) : (
-            <Typography variant="h5">
+            <Typography component="p" variant="h5">
               {`${symbolByCurrency[currency]}${(
                 gasUsedByTxType[txType] *
                 gasPriceBySpeed[speed] *

@@ -35,7 +35,7 @@ const PriceCard = (props) => {
             margin-bottom: 10px;
           `}
         >
-          <Typography variant="h6">
+          <Typography component="h2" variant="h6">
             Price
             <Typography
               variant="caption"
@@ -65,12 +65,14 @@ const PriceCard = (props) => {
                     <Typography variant="subtitle1">Fetching...</Typography>
                   </Skeleton>
                 ) : (
-                  <Typography variant="subtitle1">
+                  <Typography component="p" variant="subtitle1">
                     {`${gasPriceBySpeed[speed]}`}
                   </Typography>
                 )}
-                <Typography variant="caption">{textBySpeed[speed]}</Typography>
-                <Typography variant="caption">
+                <Typography component="h3" variant="caption">
+                  {textBySpeed[speed]}
+                </Typography>
+                <Typography component="p" variant="caption">
                   {waitTimeTextBySpeed[speed]}
                 </Typography>
               </Paper>

@@ -41,7 +41,9 @@ const HistoryCard = (props) => {
             margin-bottom: 10px;
           `}
         >
-          <Typography variant="h6">History</Typography>
+          <Typography component="h2" variant="h6">
+            History
+          </Typography>
         </div>
         {isFetching ? (
           <Skeleton variant="rect" animation="wave" width="100%" height={200} />
@@ -53,13 +55,13 @@ const HistoryCard = (props) => {
                 margin-left: -20px;
               `}
             >
+              <XAxis dataKey="hr" />
+              <YAxis />
+              <CartesianGrid vertical={false} />
               <Line type="monotone" dataKey="instant" stroke="#7400b8" />
               <Line type="monotone" dataKey="fast" stroke="#6930c3" />
               <Line type="monotone" dataKey="standard" stroke="#5e60ce" />
               <Line type="monotone" dataKey="slow" stroke="#5390d9" />
-              <XAxis dataKey="hr" />
-              <YAxis />
-              <CartesianGrid vertical={false} />
               <Tooltip />
             </LineChart>
           </ResponsiveContainer>

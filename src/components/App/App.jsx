@@ -194,7 +194,7 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
               padding: 20px 0;
             `}
           >
-            <Typography variant="h5" align="center">
+            <Typography component="h1" variant="h5" align="center">
               ⛽ Feel the Fee
             </Typography>
             <FormControl variant="outlined" size="small">
@@ -269,11 +269,12 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
           </div>
           <div
             dangerouslySetInnerHTML={{
-              __html:
-                '<a href="https://www.producthunt.com/posts/feel-the-fee?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-feel-the-fee" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=247917&theme=light" alt="Feel the Fee - Show gas fees for smart contract transactions in fiat | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" /></a>',
+              __html: `<a href="https://www.producthunt.com/posts/feel-the-fee?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-feel-the-fee" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=247917&theme=light" alt="Feel the Fee - Show gas fees for smart contract transactions in fiat | Product Hunt Embed" style="width: 100%; height: 100%;" width="250px" height="54px" /></a>`,
             }}
             css={css`
               margin-top: 20px;
+              width: 250px;
+              height: 54px;
             `}
           />
         </Container>
