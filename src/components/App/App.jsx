@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
@@ -11,6 +11,8 @@ import {
   Select,
   MenuItem,
   Grid,
+  Tooltip,
+  Button,
 } from '@material-ui/core';
 import {
   GitHub as GitHubIcon,
@@ -24,6 +26,10 @@ import HistoryCard from './HistoryCard';
 
 const App = (props) => {
   const { className } = props;
+
+  const ref = useRef({
+    supportBtnTooltipTimeoutId: null,
+  });
 
   const [currency, setCurrency] = useState('usd');
   useEffect(() => {
@@ -88,6 +94,22 @@ const App = (props) => {
       .then(() => {
         setIsFetchingGasUseds(false);
       });
+  }, []);
+
+  const [isSupportBtnTooltipOpen, setIsSupportBtnTooltipOpen] = useState(false);
+  const addrTextareaRef = useRef();
+  const handleSupportBtnClick = useCallback(() => {
+    addrTextareaRef.current.style.display = 'block';
+    addrTextareaRef.current.select();
+    document.execCommand('copy');
+    addrTextareaRef.current.style.display = 'none';
+    setIsSupportBtnTooltipOpen(true);
+    if (ref.current.supportBtnTooltipTimeoutId) {
+      clearTimeout(ref.current.supportBtnTooltipTimeoutId);
+    }
+    ref.current.supportBtnTooltipTimeoutId = setTimeout(() => {
+      setIsSupportBtnTooltipOpen(false);
+    }, 1 * 1000);
   }, []);
 
   const gasPriceBySpeed = gasPrices[0] ?? {
@@ -247,6 +269,7 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
             <div
               css={css`
                 display: flex;
+                align-items: center;
               `}
             >
               <IconButton
@@ -265,7 +288,36 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
               >
                 <GitHubIcon />
               </IconButton>
+              <Tooltip
+                title="Address Copied"
+                placement="top"
+                arrow
+                disableFocusListener
+                disableHoverListener
+                disableTouchListener
+                open={isSupportBtnTooltipOpen}
+              >
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleSupportBtnClick}
+                  css={css`
+                    margin-left: 5px;
+                  `}
+                >
+                  Support the dev
+                </Button>
+              </Tooltip>
+              <textarea
+                value="0x07b0C5E79da1bF72699cBa4bA49d9C06A15EA40e"
+                readOnly
+                ref={addrTextareaRef}
+                css={css`
+                  display: none;
+                `}
+              />
             </div>
+            <div>&copy; fff 2020</div>
           </div>
           <div
             dangerouslySetInnerHTML={{
