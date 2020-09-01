@@ -13,7 +13,9 @@ import {
   Grid,
   Tooltip,
   Button,
+  Snackbar,
 } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import {
   GitHub as GitHubIcon,
   Twitter as TwitterIcon,
@@ -29,6 +31,13 @@ const App = (props) => {
 
   const ref = useRef({
     supportBtnTooltipTimeoutId: null,
+    snackbarTimeoutId: null,
+  });
+
+  const [snackbar, setSnackbar] = useState({
+    isVisible: false,
+    severity: 'error',
+    message: '',
   });
 
   const [currency, setCurrency] = useState('usd');
@@ -93,6 +102,38 @@ const App = (props) => {
       })
       .then(() => {
         setIsFetchingGasUseds(false);
+      });
+  }, []);
+
+  const handleEmailSubscribe = useCallback((email) => {
+    if (ref.current.snackbarTimeoutId) {
+      clearTimeout(ref.current.snackbarTimeoutId);
+    }
+    ref.current.snackbarTimeoutId = setTimeout(() => {
+      setSnackbar({
+        isVisible: false,
+        severity: 'error',
+        message: '',
+      });
+    }, 3 * 1000);
+    axios
+      .post(`${process.env.API_ORIGIN}/api/user`, {
+        email,
+        isToNotifyWhen24HLow: true,
+      })
+      .then(() => {
+        setSnackbar({
+          isVisible: true,
+          severity: 'success',
+          message: 'You will be notified when the gas fee is at 24h low',
+        });
+      })
+      .catch((err) => {
+        setSnackbar({
+          isVisible: true,
+          severity: 'error',
+          message: `Failed: ${err}`,
+        });
       });
   }, []);
 
@@ -254,6 +295,7 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
                 <HistoryCard
                   isFetching={isFetchingGasPrices}
                   gasPrices={gasPrices}
+                  onEmailSubscribe={handleEmailSubscribe}
                 />
               </Grid>
             </Grid>
@@ -330,6 +372,12 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
             `}
           />
         </Container>
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={snackbar.isVisible}
+        >
+          <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+        </Snackbar>
       </div>
     </>
   );

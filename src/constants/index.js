@@ -125,3 +125,7 @@ export const waitTimeTextBySpeed = {
   standard: '≈ 5 Min.',
   slow: '> 10 Min.',
 };
+
+export const textByPeriod = {
+  '24h': '24h',
+};
