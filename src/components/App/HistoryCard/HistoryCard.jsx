@@ -17,8 +17,8 @@ const HistoryCard = (props) => {
   const { className, isFetching, gasPrices } = props;
 
   const last24HrGasPrices = [...gasPrices]
-    .reverse()
     .slice(0, 24 * 60)
+    .reverse()
     .filter((_, idx) => idx % 60 === 0)
     .map((v) => ({
       ...v,
