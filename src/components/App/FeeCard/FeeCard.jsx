@@ -16,6 +16,7 @@ import {
   symbolByCurrency,
   contractNameAndMethodByTxType,
   textByCategory,
+  defaultCategory,
   textByTxTypeByCategory,
   textBySpeed,
 } from 'constants';
@@ -30,7 +31,9 @@ const FeeCard = (props) => {
     currency,
   } = props;
 
-  const [txType, setTxType] = useState('yearn__vault__yCrv__deposit');
+  const [txType, setTxType] = useState(
+    Object.keys(textByTxTypeByCategory[defaultCategory])[0],
+  );
   const [gasUsedByTxType, setGasUsedByTxType] = useState({
     eth__transfer: 21000,
   });
@@ -50,7 +53,7 @@ const FeeCard = (props) => {
     setTxType(e.target.value);
   }, []);
 
-  const [category, setCategory] = useState('yearn');
+  const [category, setCategory] = useState(defaultCategory);
   const handleCategorySelectChange = useCallback((e) => {
     setCategory(e.target.value);
     setTxType(Object.keys(textByTxTypeByCategory[e.target.value])[0]);
