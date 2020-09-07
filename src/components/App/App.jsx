@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
+import Web3 from 'web3';
 import { css } from '@emotion/core';
 import {
   Container,
@@ -21,7 +28,11 @@ import {
   Twitter as TwitterIcon,
 } from '@material-ui/icons';
 
-import { symbolByCurrency, methodsByContractName } from 'constants';
+import {
+  symbolByCurrency,
+  txTypeByMethodByContractName,
+  contractNameAndMethodsByTxType,
+} from 'constants';
 import PriceCard from './PriceCard';
 import FeeCard from './FeeCard';
 import HistoryCard from './HistoryCard';
@@ -65,6 +76,7 @@ const App = (props) => {
     ),
   );
   useEffect(() => {
+    setIsFetchingEthPriceByCurrency(true);
     axios
       .get(
         `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=${Object.keys(
@@ -82,28 +94,61 @@ const App = (props) => {
   const [isFetchingGasPrices, setIsFetchingGasPrices] = useState(true);
   const [gasPrices, setGasPrices] = useState([]);
   useEffect(() => {
+    const fetchGasPrices = () => {
+      setIsFetchingGasPrices(true);
+      axios
+        .get(`${process.env.API_ORIGIN}/api/gas-price`)
+        .then((res) => {
+          setGasPrices(res.data);
+        })
+        .then(() => {
+          setIsFetchingGasPrices(false);
+        });
+    };
+    const intervalId = setInterval(fetchGasPrices, 60 * 1000);
+    fetchGasPrices();
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const [isFetchingContracts, setIsFetchingContracts] = useState(true);
+  const [contracts, setContracts] = useState([]);
+  useEffect(() => {
+    setIsFetchingContracts(true);
     axios
-      .get(`${process.env.API_ORIGIN}/api/gas-price`)
+      .get(`${process.env.API_ORIGIN}/api/contract`)
       .then((res) => {
-        setGasPrices(res.data);
+        setContracts(
+          res.data.filter((contract) =>
+            Object.keys(txTypeByMethodByContractName).includes(contract.name),
+          ),
+        );
       })
       .then(() => {
-        setIsFetchingGasPrices(false);
+        setIsFetchingContracts(false);
       });
   }, []);
 
-  const [isFetchingGasUseds, setIsFetchingGasUseds] = useState(true);
-  const [gasUseds, setGasUseds] = useState([]);
+  const [isFetchingTransactions, setIsFetchingTransactions] = useState(true);
+  const [transactions, setTransactions] = useState([]);
   useEffect(() => {
-    axios
-      .get(`${process.env.API_ORIGIN}/api/gas-used`)
-      .then((res) => {
-        setGasUseds(res.data);
+    setIsFetchingTransactions(true);
+    Promise.all(
+      contracts.map(async ({ address }) => {
+        const res = await axios.get(
+          `${process.env.API_ORIGIN}/api/transaction?to=${address}&limit=1000`,
+        );
+        return res.data;
+      }),
+    )
+      .then((txss) => {
+        setTransactions(txss.flat());
       })
       .then(() => {
-        setIsFetchingGasUseds(false);
+        setIsFetchingTransactions(false);
       });
-  }, []);
+  }, [contracts]);
 
   const handleEmailSubscribe = useCallback((email) => {
     if (ref.current.snackbarTimeoutId) {
@@ -153,30 +198,132 @@ const App = (props) => {
     }, 1 * 1000);
   }, []);
 
-  const gasPriceBySpeed = gasPrices[0] ?? {
-    instant: 0,
-    fast: 0,
-    standard: 0,
-    slow: 0,
-  };
-  const gasUsedByMethodByContractName = Object.entries(
-    methodsByContractName,
-  ).reduce(
-    (prev, [contractName, methods]) => ({
-      ...prev,
-      [contractName]: methods.reduce(
-        (pprev, method) => ({
-          ...pprev,
-          [method]:
-            gasUseds.find(
-              (u) => u.contractName === contractName && u.method === method,
-            )?.amount ?? 0,
+  const gasPriceBySpeed = useMemo(
+    () => ({
+      instant: gasPrices[0]?.instant ?? 0,
+      fast: gasPrices[0]?.fast ?? 0,
+      standard: gasPrices[0]?.standard ?? 0,
+      slow: gasPrices[0]?.slow ?? 0,
+    }),
+    [gasPrices],
+  );
+
+  const web3 = useMemo(() => new Web3(process.env.INFURA_API_URL), []);
+  const contractByName = useMemo(
+    () =>
+      contracts.reduce(
+        (prev, { address, abi, name }) => ({
+          ...prev,
+          [name]: new web3.eth.Contract(JSON.parse(abi), address),
         }),
         {},
       ),
-    }),
-    {},
+    [contracts, web3],
   );
+  const contractNameByAddress = useMemo(
+    () =>
+      contracts.reduce(
+        (prev, { address, name }) => ({
+          ...prev,
+          [address]: name,
+        }),
+        {},
+      ),
+    [contracts],
+  );
+  const sigByMethodByContractName = useMemo(
+    () =>
+      Object.entries(contractByName).reduce(
+        (prev, [contractName, contract]) => ({
+          ...prev,
+          [contractName]: contract.options.jsonInterface
+            .filter((i) => i.type === 'function')
+            .reduce(
+              (pprev, { name, signature }) => ({
+                ...pprev,
+                [name]: signature,
+              }),
+              {},
+            ),
+        }),
+        {},
+      ),
+    [contractByName],
+  );
+  const methodBySigByContractName = useMemo(
+    () =>
+      Object.entries(sigByMethodByContractName).reduce(
+        (prev, [contractName, sigByMethod]) => ({
+          ...prev,
+          [contractName]: Object.entries(sigByMethod).reduce(
+            (pprev, [method, signature]) => ({
+              ...pprev,
+              [signature]: method,
+            }),
+            {},
+          ),
+        }),
+        {},
+      ),
+    [sigByMethodByContractName],
+  );
+  const txsByMethodByContractName = useMemo(
+    () =>
+      transactions.reduce((prev, tx) => {
+        const contractName = contractNameByAddress[tx.to];
+        const method =
+          methodBySigByContractName[contractName]?.[tx.input.slice(0, 10)];
+        if (!method || !txTypeByMethodByContractName[contractName]?.[method]) {
+          return prev;
+        }
+        return {
+          ...prev,
+          [contractName]: {
+            ...(prev[contractName] ?? {}),
+            [method]: [...(prev[contractName]?.[method] ?? []), tx],
+          },
+        };
+      }, {}),
+    [transactions, methodBySigByContractName, contractNameByAddress],
+  );
+  const gasUsedByTxType = useMemo(() => {
+    const now = new Date();
+    return {
+      ...{
+        eth__transfer: 21000,
+      },
+      ...Object.entries(contractNameAndMethodsByTxType).reduce(
+        (prev, [txType, contractNameAndMethods]) => {
+          let numValidMethods = 0;
+          const result = contractNameAndMethods.reduce(
+            (pprev, { contractName, method }) => {
+              const txs =
+                txsByMethodByContractName?.[contractName]?.[method] ?? [];
+              const txsWithinHour = txs.filter(
+                (tx) => tx.timestamp * 1000 > now.getTime() - 60 * 60 * 1000,
+              );
+              if (txsWithinHour.length === 0) {
+                return pprev;
+              }
+              const sum = txsWithinHour.reduce(
+                (ppprev, tx) => ppprev + tx.gas.used,
+                0,
+              );
+              const avg = sum / txsWithinHour.length;
+              numValidMethods += 1;
+              return pprev + avg;
+            },
+            0,
+          );
+          return {
+            ...prev,
+            [txType]: result / numValidMethods,
+          };
+        },
+        {},
+      ),
+    };
+  }, [txsByMethodByContractName]);
 
   return (
     <>
@@ -282,11 +429,12 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
                 <FeeCard
                   isFetching={
                     isFetchingGasPrices ||
-                    isFetchingGasUseds ||
+                    isFetchingContracts ||
+                    isFetchingTransactions ||
                     isFetchingEthPriceByCurrency
                   }
                   gasPriceBySpeed={gasPriceBySpeed}
-                  gasUsedByMethodByContractName={gasUsedByMethodByContractName}
+                  gasUsedByTxType={gasUsedByTxType}
                   ethPrice={ethPriceByCurrency[currency]}
                   currency={currency}
                 />

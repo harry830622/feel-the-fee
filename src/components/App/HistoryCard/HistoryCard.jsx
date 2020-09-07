@@ -27,6 +27,7 @@ import { textByPeriod } from 'constants';
 const HistoryCard = (props) => {
   const { className, isFetching, gasPrices, onEmailSubscribe } = props;
 
+  const [periodGasPrices, setPeriodGasPrices] = useState([]);
   const [period, setPeriod] = useState('24h');
   useEffect(() => {
     if (localStorage.getItem('period')) {
@@ -37,6 +38,75 @@ const HistoryCard = (props) => {
     setPeriod(e.target.value);
     localStorage.setItem('period', e.target.value);
   }, []);
+  useEffect(() => {
+    const now = new Date();
+    const endTime = new Date(now.getTime());
+    switch (period) {
+      case '24h': {
+        endTime.setHours(now.getHours() - 1);
+        endTime.setMinutes(0);
+        endTime.setSeconds(0);
+        endTime.setMilliseconds(0);
+        let i = 0;
+        setPeriodGasPrices(
+          [...gasPrices]
+            .filter(
+              (gasPrice) =>
+                gasPrice.timestamp <= endTime.getTime() &&
+                gasPrice.timestamp > endTime.getTime() - 24 * 60 * 60 * 1000,
+            )
+            .reduce((prev, gasPrice) => {
+              const result = [...prev];
+              if (gasPrice.timestamp > endTime.getTime() - i * 60 * 60 * 1000) {
+                result[result.length - 1].push(gasPrice);
+              } else {
+                result.push([]);
+                i += 1;
+              }
+              return result;
+            }, [])
+            .map((gasPricesWithinDay) => {
+              const result = gasPricesWithinDay.reduce(
+                (prev, gasPrice) => ({
+                  instant: prev.instant + gasPrice.instant,
+                  fast: prev.fast + gasPrice.fast,
+                  standard: prev.standard + gasPrice.standard,
+                  slow: prev.slow + gasPrice.slow,
+                }),
+                { instant: 0, fast: 0, standard: 0, slow: 0 },
+              );
+              if (gasPricesWithinDay.length === 0) {
+                return result;
+              }
+              return {
+                instant: Math.ceil(result.instant / gasPricesWithinDay.length),
+                fast: Math.ceil(result.fast / gasPricesWithinDay.length),
+                standard: Math.ceil(
+                  result.standard / gasPricesWithinDay.length,
+                ),
+                slow: Math.ceil(result.slow / gasPricesWithinDay.length),
+              };
+            })
+            .map(({ instant, fast, standard, slow }, idx) => {
+              const time = new Date(endTime);
+              time.setHours(endTime.getHours() - idx);
+              return {
+                instant,
+                fast,
+                standard,
+                slow,
+                h: `${time.getHours() < 10 ? '0' : ''}${time.getHours()}:00`,
+              };
+            })
+            .reverse(),
+        );
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [period, gasPrices]);
 
   const [email, setEmail] = useState('');
   const emailTextFieldRef = useRef();
@@ -50,15 +120,6 @@ const HistoryCard = (props) => {
     onEmailSubscribe(email);
     setEmail('');
   }, [email, onEmailSubscribe]);
-
-  const last24HrGasPrices = [...gasPrices]
-    .slice(0, 24 * 60)
-    .reverse()
-    .filter((_, idx) => idx % 60 === 0)
-    .map((v) => ({
-      ...v,
-      hr: `${new Date(1000 * v.timestamp).getHours()}:00`,
-    }));
 
   return (
     <div className={className}>
@@ -94,12 +155,23 @@ const HistoryCard = (props) => {
         ) : (
           <ResponsiveContainer width="100%" height={200}>
             <LineChart
-              data={last24HrGasPrices}
+              data={periodGasPrices}
               css={css`
                 margin-left: -20px;
               `}
             >
-              <XAxis dataKey="hr" />
+              <XAxis
+                dataKey={(() => {
+                  switch (period) {
+                    case '24h': {
+                      return 'h';
+                    }
+                    default: {
+                      return 'h';
+                    }
+                  }
+                })()}
+              />
               <YAxis />
               <CartesianGrid vertical={false} />
               <Line type="monotone" dataKey="instant" stroke="#7400b8" />

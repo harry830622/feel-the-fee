@@ -14,7 +14,6 @@ import { Skeleton } from '@material-ui/lab';
 
 import {
   symbolByCurrency,
-  contractNameAndMethodByTxType,
   textByCategory,
   defaultCategory,
   textByTxTypeByCategory,
@@ -26,7 +25,7 @@ const FeeCard = (props) => {
     className,
     isFetching,
     gasPriceBySpeed,
-    gasUsedByMethodByContractName,
+    gasUsedByTxType,
     ethPrice,
     currency,
   } = props;
@@ -34,21 +33,6 @@ const FeeCard = (props) => {
   const [txType, setTxType] = useState(
     Object.keys(textByTxTypeByCategory[defaultCategory])[0],
   );
-  const [gasUsedByTxType, setGasUsedByTxType] = useState({
-    eth__transfer: 21000,
-  });
-  useEffect(() => {
-    setGasUsedByTxType((prev) => ({
-      ...prev,
-      ...Object.entries(contractNameAndMethodByTxType).reduce(
-        (pprev, [t, [contractName, method]]) => ({
-          ...pprev,
-          [t]: gasUsedByMethodByContractName?.[contractName]?.[method],
-        }),
-        {},
-      ),
-    }));
-  }, [gasUsedByMethodByContractName]);
   const handleTxTypeSelectChange = useCallback((e) => {
     setTxType(e.target.value);
   }, []);
@@ -146,12 +130,14 @@ const FeeCard = (props) => {
             </Skeleton>
           ) : (
             <Typography component="p" variant="h5">
-              {`${symbolByCurrency[currency]}${(
-                gasUsedByTxType[txType] *
-                gasPriceBySpeed[speed] *
-                1e-9 *
-                ethPrice
-              ).toFixed(2)}`}
+              {Number.isNaN(gasUsedByTxType[txType])
+                ? 'N/A'
+                : `${symbolByCurrency[currency]}${(
+                    gasUsedByTxType[txType] *
+                    gasPriceBySpeed[speed] *
+                    1e-9 *
+                    ethPrice
+                  ).toFixed(2)}`}
             </Typography>
           )}
         </div>
@@ -169,7 +155,7 @@ FeeCard.propTypes = {
     standard: PropTypes.number.isRequired,
     slow: PropTypes.number.isRequired,
   }).isRequired,
-  gasUsedByMethodByContractName: PropTypes.object.isRequired,
+  gasUsedByTxType: PropTypes.object.isRequired,
   ethPrice: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
 };

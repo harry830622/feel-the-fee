@@ -10,7 +10,7 @@
 
 
 ## Development
-Setup the .env.dev first, and then
+Setup the `.env.dev` first, and then
 ```
 yarn
 npm run dev
