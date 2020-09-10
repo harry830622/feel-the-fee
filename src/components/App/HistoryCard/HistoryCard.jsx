@@ -48,16 +48,28 @@ const HistoryCard = (props) => {
         endTime.setSeconds(0);
         endTime.setMilliseconds(0);
         let i = 0;
+        let gasPricesWithinPeriod = [];
+        gasPrices.every((gasPrice) => {
+          const gasPriceTime = new Date(gasPrice.timestamp);
+          const isWithinPeriod =
+            gasPriceTime.getTime() <= endTime.getTime() &&
+            gasPriceTime.getTime() > endTime.getTime() - 24 * 60 * 60 * 1000;
+          if (isWithinPeriod) {
+            gasPricesWithinPeriod = [...gasPricesWithinPeriod, gasPrice];
+          }
+          return (
+            gasPriceTime.getTime() > endTime.getTime() - 24 * 60 * 60 * 1000
+          );
+        });
         setPeriodGasPrices(
-          [...gasPrices]
-            .filter(
-              (gasPrice) =>
-                gasPrice.timestamp <= endTime.getTime() &&
-                gasPrice.timestamp > endTime.getTime() - 24 * 60 * 60 * 1000,
-            )
+          [...gasPricesWithinPeriod]
             .reduce((prev, gasPrice) => {
+              const gasPriceTime = new Date(gasPrice.timestamp);
               const result = [...prev];
-              if (gasPrice.timestamp > endTime.getTime() - i * 60 * 60 * 1000) {
+              if (
+                gasPriceTime.getTime() >
+                endTime.getTime() - i * 60 * 60 * 1000
+              ) {
                 result[result.length - 1].push(gasPrice);
               } else {
                 result.push([]);

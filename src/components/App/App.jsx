@@ -26,6 +26,7 @@ import { Alert } from '@material-ui/lab';
 import {
   GitHub as GitHubIcon,
   Twitter as TwitterIcon,
+  Extension as ExtensionIcon,
 } from '@material-ui/icons';
 
 import {
@@ -299,17 +300,24 @@ const App = (props) => {
             (pprev, { contractName, method }) => {
               const txs =
                 txsByMethodByContractName?.[contractName]?.[method] ?? [];
-              const txsWithinHour = txs.filter(
-                (tx) => tx.timestamp * 1000 > now.getTime() - 60 * 60 * 1000,
-              );
-              if (txsWithinHour.length === 0) {
+              let txsWithinPeriod = [];
+              txs.every((tx) => {
+                const txTime = new Date(tx.timestamp);
+                const isWithinPeriod =
+                  txTime.getTime() > now.getTime() - 60 * 60 * 1000;
+                if (isWithinPeriod) {
+                  txsWithinPeriod = [...txsWithinPeriod, tx];
+                }
+                return isWithinPeriod;
+              });
+              if (txsWithinPeriod.length === 0) {
                 return pprev;
               }
-              const sum = txsWithinHour.reduce(
+              const sum = txsWithinPeriod.reduce(
                 (ppprev, tx) => ppprev + tx.gas.used,
                 0,
               );
-              const avg = sum / txsWithinHour.length;
+              const avg = sum / txsWithinPeriod.length;
               numValidMethods += 1;
               return pprev + avg;
             },
@@ -464,6 +472,14 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
             >
               <IconButton
                 size="small"
+                href="https://chrome.google.com/webstore/detail/feel-the-fee/ogajfoicbmjoggcpkmhddokjoipjbnkg"
+                target="_blank"
+                rel="noopener"
+              >
+                <ExtensionIcon />
+              </IconButton>
+              <IconButton
+                size="small"
                 href="https://twitter.com/harry830622"
                 target="_blank"
                 rel="noopener"
@@ -495,7 +511,7 @@ gtag('config', '${process.env.GA_TRACKING_ID}');
                     margin-left: 5px;
                   `}
                 >
-                  Support the dev
+                  Donate
                 </Button>
               </Tooltip>
               <textarea
