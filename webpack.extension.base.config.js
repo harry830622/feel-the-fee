@@ -85,7 +85,7 @@ module.exports = {
       template: path.resolve(__dirname, 'src/extension/popup/index.ejs'),
       chunks: ['popup'],
     }),
-    new EnvironmentPlugin(['API_ORIGIN']),
+    new EnvironmentPlugin(['API_ORIGIN', 'INFURA_API_URL']),
     new CopyPlugin({
       patterns: [
         path.resolve(__dirname, 'src/extension/manifest.json'),
